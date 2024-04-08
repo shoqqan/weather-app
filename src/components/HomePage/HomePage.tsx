@@ -12,7 +12,6 @@ export const HomePage = () => {
     const [title, setTitle] = useState('');
     const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch<any>()
-    console.log(currentWeather)
     const loadWeather = (city: string) => {
         if (!city) return;
         dispatch(setCurrentWeatherThunk(city))
@@ -22,6 +21,7 @@ export const HomePage = () => {
     };
 
     const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        setError("")
         setTitle(event.currentTarget.value);
     };
 

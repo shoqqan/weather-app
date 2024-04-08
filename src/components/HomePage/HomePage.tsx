@@ -1,18 +1,24 @@
 import {ChangeEvent, KeyboardEvent, useEffect, useState} from "react";
-import {API, fetchCityName} from "../../api/api";
+import {fetchCityName} from "../../api/api";
 import {Weather} from "../Weather/Weather";
-import {WeatherInfo} from "../../models/apiResponse";
+import {useDispatch, useSelector} from "react-redux";
+import {AppStateType} from "../../store/store.ts";
+import {setCurrentWeatherThunk, setForecastWeatherThunk} from "../../store/reducers/appReducer.ts";
+import {WeatherInfo} from "../../models/apiResponce.ts";
 
 export const HomePage = () => {
-    const [currentWeather, setCurrentWeather] = useState<WeatherInfo | null>(null);
-    const [forecastWeather, setForecastWeather] = useState<WeatherInfo[]>([]);
+    const currentWeather = useSelector<AppStateType, WeatherInfo | null>(state => state.appReducer.currentWeather)
+    const forecastWeather = useSelector<AppStateType, WeatherInfo[]>(state => state.appReducer.weatherForecast)
     const [title, setTitle] = useState('');
     const [error, setError] = useState<string | null>(null);
-
+    const dispatch = useDispatch<any>()
+    console.log(currentWeather)
     const loadWeather = (city: string) => {
         if (!city) return;
-        API.getCurrentWeatherData(city).then(res => setCurrentWeather(res.data));
-        API.getForecastWeatherData(city).then(res => setForecastWeather(res.data.list.filter(item => item.dt_txt.includes("15:00:00"))));
+        dispatch(setCurrentWeatherThunk(city))
+        dispatch(setForecastWeatherThunk(city))
+        // API.getCurrentWeatherData(city).then(res => setCurrentWeather(res.data));
+        // API.getForecastWeatherData(city).then(res => setForecastWeather(res.data.list.filter(item => item.dt_txt.includes("15:00:00"))));
     };
 
     const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +46,7 @@ export const HomePage = () => {
             console.error(error);
             setError('Unable to retrieve your location.');
         });
-    }, []); // Пустой массив зависимостей гарантирует, что эффект выполнится только один раз
+    }, []);
 
     return (
         <div className={'w-screen h-screen overflow-hidden flex flex-col items-center'}>
